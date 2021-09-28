@@ -67,10 +67,8 @@ public class ViewSwitcher {
                 loader = new FXMLLoader(fxmlFile);
 
                 if (PeopleListController.getInstance().isEditMode() && PeopleListController.getInstance().getPeopleList().getSelectionModel().getSelectedItem() != null) {
-                    String firstName = PeopleListController.getInstance().getPeopleList().getSelectionModel().getSelectedItem().split(" ")[0];
-                    String lastName =PeopleListController.getInstance().getPeopleList().getSelectionModel().getSelectedItem().split(" ")[1];
-                    logger.info("READING " + firstName + " " + lastName);
-                    personToEdit = getPerson(firstName, lastName);
+                    personToEdit = PeopleListController.getInstance().getPeopleList().getSelectionModel().getSelectedItem();
+                    logger.info("READING " + personToEdit);
                     loader.setController(new PeopleEditController(personToEdit));
                 }
                 else if (!(PeopleListController.getInstance().isEditMode())) {
@@ -83,15 +81,6 @@ public class ViewSwitcher {
                 rootPane.setCenter(loader.load());
                 break;
         }
-    }
-
-    Person getPerson(String firstName, String lastName) {
-        Person personFound = null;
-        for (int i = 0; i < getPeople().size(); i++) {
-            if (firstName.equals(getPeople().get(i).getFirstName()) && lastName.equals(getPeople().get(i).getLastName()))
-                personFound = getPeople().get(i);
-        }
-        return personFound;
     }
 
     public static void setInstance(ViewSwitcher instance) {

@@ -3,7 +3,6 @@ package mvc.controllers;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import mvc.models.Person;
 import org.apache.logging.log4j.LogManager;
@@ -22,6 +21,9 @@ public class PeopleListController implements Initializable {
         PeopleListController.instance = instance;
     }
 
+    @FXML
+    private ListView<Person> peopleList;
+
     public static PeopleListController getInstance() {
         if (instance == null)
             instance = new PeopleListController();
@@ -31,20 +33,9 @@ public class PeopleListController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         editMode = true;
         for (int i = 0; i < ViewSwitcher.getInstance().getPeople().size(); i++) {
-            peopleList.getItems().add(ViewSwitcher.getInstance().getPeople().get(i).getFirstName() + " " + ViewSwitcher.getInstance().getPeople().get(i).getLastName());
+            peopleList.getItems().add(ViewSwitcher.getInstance().getPeople().get(i));
         }
     }
-    @FXML
-    private Button addBtn;
-
-    @FXML
-    private Button editBtn;
-
-    @FXML
-    private ListView<String> peopleList;
-
-    @FXML
-    private Button deleteBtn;
 
     @FXML
     void edit(ActionEvent event) throws IOException {
@@ -66,17 +57,14 @@ public class PeopleListController implements Initializable {
             logger.error("No person selected");
         }
         else {
-            String firstName = peopleList.getSelectionModel().getSelectedItem().split(" ")[0];
-            String lastName = peopleList.getSelectionModel().getSelectedItem().split(" ")[1];
-
-            Person personToDelete = ViewSwitcher.getInstance().getPerson(firstName, lastName);
-            peopleList.getItems().remove(firstName + " " + lastName);
+            Person personToDelete = peopleList.getSelectionModel().getSelectedItem();
+            peopleList.getItems().remove(personToDelete);
             ViewSwitcher.getInstance().getPeople().remove(personToDelete);
-            logger.info("DELETING " + firstName + " " + lastName);
+            logger.info("DELETING " + personToDelete);
         }
     }
 
-    public ListView<String> getPeopleList() {
+    public ListView<Person> getPeopleList() {
         return peopleList;
     }
 
