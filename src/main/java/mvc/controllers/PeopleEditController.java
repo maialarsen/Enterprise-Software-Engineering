@@ -64,15 +64,8 @@ public class PeopleEditController implements Initializable {
 
     @FXML
     void save(ActionEvent event) throws IOException {
-        if(firstName.getText().isBlank() || lastName.getText().isBlank() || idNum.getText().isBlank()) {
+        if(firstName.getText().isBlank() || lastName.getText().isBlank()) {
             logger.error("One or more fields have been left blank");
-            return;
-        }
-
-        try {
-            Integer.parseInt(idNum.getText());
-        } catch (NumberFormatException e) {
-            logger.error("ID " + idNum.getText() + " is not a number");
             return;
         }
 
@@ -80,11 +73,9 @@ public class PeopleEditController implements Initializable {
             this.person.setFirstName(firstName.getText());
             this.person.setLastName(lastName.getText());
             this.person.setDateOfBirth(dateOfBirth.getValue());
-            this.person.setId(Integer.parseInt(idNum.getText()));
             logger.info("UPDATING " + this.person.getFirstName() + " " + this.person.getLastName());
         } else {
             Person newPerson = new Person(firstName.getText(), lastName.getText(), dateOfBirth.getValue());
-            newPerson.setId(Integer.parseInt(idNum.getText()));
             ViewSwitcher.getInstance().getPeople().add(newPerson);
             logger.info("CREATING " + newPerson.getFirstName() + " " + newPerson.getLastName());
         }

@@ -20,7 +20,7 @@
                   <Label layoutX="62.0" layoutY="133.0" text="ID" />
                </children>
             </Pane>
-            <TextField fx:id="idNum" layoutX="103.0" layoutY="115.0" />
+            <TextField fx:id="idNum" disable="true" layoutX="103.0" layoutY="115.0" />
             <DatePicker fx:id="dateOfBirth" layoutX="102.0" layoutY="84.0" />
          </children>
       </Pane>

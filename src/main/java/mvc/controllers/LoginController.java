@@ -4,6 +4,7 @@ import exceptions.UnauthorizedException;
 import exceptions.UnknownException;
 import gateways.Session;
 import gateways.SessionGateway;
+import hash.HashUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -27,11 +28,12 @@ public class LoginController implements Initializable {
 
     @FXML
     void login(ActionEvent event) throws IOException {
+        Session sessionId = null;
         String username = this.username.getText();
-        String password = this.password.getText();
+        String hash = HashUtils.getCryptoHash(this.password.getText(), "SHA-256");
 
         try {
-            Session sessionId = SessionGateway.login(username, password);
+            sessionId = SessionGateway.login(username, hash);
         } catch(UnauthorizedException e) {
             logger.error("Login failed! Either your username or password is incorrect");
             return;
@@ -41,6 +43,8 @@ public class LoginController implements Initializable {
         }
 
         logger.info(this.username.getText() + " LOGGED IN");
+        logger.info(sessionId);
+        ViewSwitcher.getInstance().setSession(sessionId);
         ViewSwitcher.getInstance().switchView(ViewScreen.PEOPLELISTVIEW);
     }
 

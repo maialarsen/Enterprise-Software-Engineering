@@ -1,5 +1,7 @@
 package mvc.controllers;
 
+import gateways.PersonGateway;
+import gateways.Session;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
@@ -10,7 +12,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.net.URL;
-import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class ViewSwitcher {
@@ -19,7 +20,13 @@ public class ViewSwitcher {
     private BorderPane rootPane;
     private static final Logger logger = LogManager.getLogger();
 
+    private Session session;
+    private PersonGateway personGateway;
     private ArrayList<Person> people;
+
+    private ViewSwitcher() {
+        personGateway = new PersonGateway();
+    }
 
     public static ViewSwitcher getInstance() {
         if (instance == null)
@@ -28,16 +35,8 @@ public class ViewSwitcher {
     }
 
     public void initStage() throws IOException {
-        people = new ArrayList<Person>();
-        people.add(new Person("John", "Doe", LocalDate.of(2000, 2, 13)));
-        people.add(new Person("Greg", "Smith", LocalDate.of(1998, 6, 20)));
-        people.add(new Person("Helda", "Johnson", LocalDate.of(2002, 11, 3)));
-        for(int i = 1; i <= people.size(); i++)
-            people.get(i - 1).setId(i);
-
-
         Scene scene = new Scene(rootPane, 600, 400);
-        stage.setTitle("Assignment 1");
+        stage.setTitle("Assignment 2");
         stage.setScene(scene);
         stage.show();
         switchView(ViewScreen.LOGINVIEW);
@@ -55,6 +54,8 @@ public class ViewSwitcher {
                 rootPane.setCenter(loader.load());
                 break;
             case PEOPLELISTVIEW:
+                people = PersonGateway.fetchPeople(session.getSessionId());
+
                 fxmlFile = this.getClass().getResource("/peopleListView.fxml");
                 loader = new FXMLLoader(fxmlFile);
                 PeopleListController.setInstance(peopleListController);
@@ -109,5 +110,21 @@ public class ViewSwitcher {
 
     public void setPeople(ArrayList<Person> people) {
         this.people = people;
+    }
+
+    public Session getSession() {
+        return session;
+    }
+
+    public void setSession(Session session) {
+        this.session = session;
+    }
+
+    public PersonGateway getPersonGateway() {
+        return personGateway;
+    }
+
+    public void setPersonGateway(PersonGateway personGateway) {
+        this.personGateway = personGateway;
     }
 }
