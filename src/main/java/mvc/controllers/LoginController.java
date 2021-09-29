@@ -1,9 +1,12 @@
 package mvc.controllers;
 
+import exceptions.UnauthorizedException;
+import exceptions.UnknownException;
+import gateways.Session;
+import gateways.SessionGateway;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import org.apache.logging.log4j.LogManager;
@@ -23,11 +26,21 @@ public class LoginController implements Initializable {
     private PasswordField password;
 
     @FXML
-    private Button loginBtn;
-
-    @FXML
     void login(ActionEvent event) throws IOException {
-        logger.info(username.getText() + " LOGGED IN");
+        String username = this.username.getText();
+        String password = this.password.getText();
+
+        try {
+            Session sessionId = SessionGateway.login(username, password);
+        } catch(UnauthorizedException e) {
+            logger.error("Login failed! Either your username or password is incorrect");
+            return;
+        } catch (UnknownException e) {
+            logger.error("Login failed! Something went wrong please try again");
+            return;
+        }
+
+        logger.info(this.username.getText() + " LOGGED IN");
         ViewSwitcher.getInstance().switchView(ViewScreen.PEOPLELISTVIEW);
     }
 
