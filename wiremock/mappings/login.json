@@ -3,7 +3,7 @@
     "method": "POST",
     "url": "/login",
     "bodyPatterns" : [ {
-      "equalToJson" : "{\"username\":\"ragnar\",\"password\":\"3ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4\"}",
+      "equalToJson" : "{\"username\":\"ragnar\",\"password\":\"28c51e83fc8973a4aaba1c18f78f76dc5a0b5f14fb894e6369acbf03840c0f27\"}",
       "ignoreArrayOrder" : true,
       "ignoreExtraElements" : true
     } ]

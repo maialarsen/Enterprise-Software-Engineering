@@ -1,5 +1,8 @@
 package mvc.controllers;
 
+import gateways.PersonGateway;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
 
@@ -14,11 +17,15 @@ import javafx.scene.control.TextField;
 import mvc.models.Person;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class PeopleEditController implements Initializable {
     private Person person;
     private boolean editMode;
     private static final Logger logger = LogManager.getLogger();
+
+    JSONObject updates = new JSONObject();
 
     public PeopleEditController() {
         this.person = null;
@@ -36,11 +43,35 @@ public class PeopleEditController implements Initializable {
             lastName.setText(person.getLastName());
             dateOfBirth.setValue(person.getDateOfBirth());
             idNum.setText(Integer.toString(person.getId()));
+            age.setText(Integer.toString(person.getAge()));
+
+            firstName.textProperty().addListener(new ChangeListener<String>() {
+                @Override
+                public void changed(ObservableValue<? extends String> observableValue, String s, String t1) {
+                    updates.put("first_name", firstName.getText());
+                }
+            });
+
+            lastName.textProperty().addListener(new ChangeListener<String>() {
+                @Override
+                public void changed(ObservableValue<? extends String> observableValue, String s, String t1) {
+                    updates.put("last_name", lastName.getText());
+                }
+            });
+
+            dateOfBirth.valueProperty().addListener(new ChangeListener<LocalDate>() {
+                @Override
+                public void changed(ObservableValue<? extends LocalDate> observableValue, LocalDate localDate, LocalDate t1) {
+                    updates.put("birth_date", dateOfBirth.getValue().toString());
+                }
+            });
+
         } else {
             firstName.setText("");
             lastName.setText("");
             dateOfBirth.setValue(LocalDate.now());
             idNum.setText("");
+            age.setText("");
         }
     }
 
@@ -60,22 +91,36 @@ public class PeopleEditController implements Initializable {
     private TextField idNum;
 
     @FXML
+    private TextField age;
+
+    @FXML
     private Button saveBtn;
 
     @FXML
     void save(ActionEvent event) throws IOException {
-        if(firstName.getText().isBlank() || lastName.getText().isBlank()) {
+        if (firstName.getText().isBlank() || lastName.getText().isBlank()) {
             logger.error("One or more fields have been left blank");
             return;
         }
 
+        if (dateOfBirth.getValue().isAfter(LocalDate.now())) {
+            logger.error("Birth date needs to be before current date");
+            return;
+        }
+
         if (editMode) {
-            this.person.setFirstName(firstName.getText());
-            this.person.setLastName(lastName.getText());
-            this.person.setDateOfBirth(dateOfBirth.getValue());
+            updates.put("id", idNum.getText());
+            PersonGateway.updatePerson(ViewSwitcher.getInstance().getSession().getSessionId(), updates);
             logger.info("UPDATING " + this.person.getFirstName() + " " + this.person.getLastName());
         } else {
             Person newPerson = new Person(firstName.getText(), lastName.getText(), dateOfBirth.getValue());
+            JSONObject newPersonInfo = new JSONObject();
+
+            newPersonInfo.put("firstName", firstName.getText());
+            newPersonInfo.put("lastName", lastName.getText());
+            newPersonInfo.put("dateOfBirth", dateOfBirth.getValue());
+
+            PersonGateway.insertPerson(ViewSwitcher.getInstance().getSession().getSessionId(), newPersonInfo);
             ViewSwitcher.getInstance().getPeople().add(newPerson);
             logger.info("CREATING " + newPerson.getFirstName() + " " + newPerson.getLastName());
         }

@@ -88,16 +88,14 @@ public class Person {
         }
     }
 
-    public static int calculateAge(LocalDate birthDate) {
-        if (birthDate != null) {
+    public int calculateAge(LocalDate birthDate) {
+        if (birthDate != null)
             return Period.between(birthDate, LocalDate.now()).getYears();
-        } else {
-            return 0;
-        }
+        return 0;
     }
 
     @Override
     public String toString() {
-        return firstName + ' ' + lastName;
+        return this.firstName + ' ' + this.lastName;
     }
 }

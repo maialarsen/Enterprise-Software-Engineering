@@ -1,5 +1,6 @@
 package mvc.controllers;
 
+import gateways.PersonGateway;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -50,7 +51,8 @@ public class PeopleListController implements Initializable {
     }
 
     @FXML
-    void deleteSelected(ActionEvent event) {
+    void deleteSelected(ActionEvent event) throws IOException {
+        PersonGateway.deletePerson(ViewSwitcher.getInstance().getSession().getSessionId(), peopleList.getSelectionModel().getSelectedItem());
         if (peopleList.getItems().size() == 0) {
             logger.error("No people to delete");
         } else if (peopleList.getSelectionModel().getSelectedItem() == null) {
