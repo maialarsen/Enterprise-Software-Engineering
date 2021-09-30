@@ -52,7 +52,6 @@ public class PeopleListController implements Initializable {
 
     @FXML
     void deleteSelected(ActionEvent event) throws IOException {
-        PersonGateway.deletePerson(ViewSwitcher.getInstance().getSession().getSessionId(), peopleList.getSelectionModel().getSelectedItem());
         if (peopleList.getItems().size() == 0) {
             logger.error("No people to delete");
         } else if (peopleList.getSelectionModel().getSelectedItem() == null) {
@@ -60,9 +59,7 @@ public class PeopleListController implements Initializable {
         }
         else {
             Person personToDelete = peopleList.getSelectionModel().getSelectedItem();
-            peopleList.getItems().remove(personToDelete);
-            ViewSwitcher.getInstance().getPeople().remove(personToDelete);
-            logger.info("DELETING " + personToDelete);
+            PersonGateway.deletePerson(ViewSwitcher.getInstance().getSession().getSessionId(), personToDelete);
         }
     }
 

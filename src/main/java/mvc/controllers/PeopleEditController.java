@@ -48,21 +48,21 @@ public class PeopleEditController implements Initializable {
             firstName.textProperty().addListener(new ChangeListener<String>() {
                 @Override
                 public void changed(ObservableValue<? extends String> observableValue, String s, String t1) {
-                    updates.put("first_name", firstName.getText());
+                    updates.put("firstName", firstName.getText());
                 }
             });
 
             lastName.textProperty().addListener(new ChangeListener<String>() {
                 @Override
                 public void changed(ObservableValue<? extends String> observableValue, String s, String t1) {
-                    updates.put("last_name", lastName.getText());
+                    updates.put("lastName", lastName.getText());
                 }
             });
 
             dateOfBirth.valueProperty().addListener(new ChangeListener<LocalDate>() {
                 @Override
                 public void changed(ObservableValue<? extends LocalDate> observableValue, LocalDate localDate, LocalDate t1) {
-                    updates.put("birth_date", dateOfBirth.getValue().toString());
+                    updates.put("dateOfBirth", dateOfBirth.getValue().toString());
                 }
             });
 
@@ -118,11 +118,10 @@ public class PeopleEditController implements Initializable {
 
             newPersonInfo.put("firstName", firstName.getText());
             newPersonInfo.put("lastName", lastName.getText());
-            newPersonInfo.put("dateOfBirth", dateOfBirth.getValue());
+            newPersonInfo.put("dateOfBirth", dateOfBirth.getValue().toString());
 
             PersonGateway.insertPerson(ViewSwitcher.getInstance().getSession().getSessionId(), newPersonInfo);
             ViewSwitcher.getInstance().getPeople().add(newPerson);
-            logger.info("CREATING " + newPerson.getFirstName() + " " + newPerson.getLastName());
         }
         ViewSwitcher.getInstance().switchView(ViewScreen.PEOPLELISTVIEW);
     }

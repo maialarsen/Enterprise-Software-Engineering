@@ -2,6 +2,8 @@ package gateways;
 
 import exceptions.UnauthorizedException;
 import exceptions.UnknownException;
+import javafx.Alerts;
+import mvc.controllers.PeopleListController;
 import mvc.controllers.ViewSwitcher;
 import mvc.models.Person;
 import org.apache.http.HttpEntity;
@@ -11,16 +13,22 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import javax.swing.text.View;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class PersonGateway {
     private static final String URL = "http://localhost:8080";
     private String token;
+    private static final Logger logger = LogManager.getLogger();
 
     public PersonGateway() {}
     public PersonGateway(String token) {
@@ -32,9 +40,12 @@ public class PersonGateway {
 
         try {
             String response = executeGetRequest(URL + "/people", token);
-            JSONArray peopleList = new JSONArray(response);
-            for(Object person: peopleList) {
-                people.add(Person.fromJSONObject((JSONObject) person));
+
+            if (response != null) {
+                JSONArray peopleList = new JSONArray(response);
+                for (Object person : peopleList) {
+                    people.add(Person.fromJSONObject((JSONObject) person));
+                }
             }
         } catch(RuntimeException | IOException e) {
             throw new UnknownException(e);
@@ -45,7 +56,29 @@ public class PersonGateway {
 
     public static void updatePerson(String token, JSONObject updates) {
         try {
-            String response = executePutRequest(URL + "/people/" + updates.get("id"), token, updates);
+            int id = updates.getInt("id");
+            String response = executePutRequest(URL + "/people/" + updates.getInt("id"), token, updates);
+
+            if (response != null) {
+                Person personToUpdate = ViewSwitcher.getInstance().findById(id);
+
+                Iterator<String> keys = updates.keys();
+
+                while (keys.hasNext()) {
+                    String key = keys.next();
+                    if (key.equals("firstName")) {
+                        personToUpdate.setFirstName(updates.getString("firstName"));
+                    }
+                    if (key.equals("lastName")) {
+                        personToUpdate.setLastName(updates.getString("lastName"));
+                    }
+                    if (key.equals("dateOfBirth")) {
+                        personToUpdate.setDateOfBirth(LocalDate.parse(updates.getString("dateOfBirth")));
+                    }
+                }
+
+                logger.info("UPDATING " + personToUpdate.toString());
+            }
 
         } catch(RuntimeException | IOException e) {
             throw new UnknownException(e);
@@ -55,6 +88,14 @@ public class PersonGateway {
     public static void insertPerson(String token, JSONObject newPersonInfo) {
         try {
             String response = executePostRequest(URL + "/people", token, newPersonInfo);
+
+            if (response != null) {
+                Person person = new Person(newPersonInfo.getString("firstName"), newPersonInfo.getString("lastName").toString(), LocalDate.parse(newPersonInfo.getString("dateOfBirth")));
+                ViewSwitcher.getInstance().getPeople().add(person);
+                PeopleListController.getInstance().getPeopleList().getItems().add(person);
+                logger.info("CREATING " + person.toString());
+            }
+
         } catch(RuntimeException | IOException e) {
             throw new UnknownException(e);
         }
@@ -62,21 +103,31 @@ public class PersonGateway {
 
     public static void deletePerson(String token, Person person) throws IOException {
         String response = executeDeleteRequest(URL + "/people/" + person.getId(), token);
-        ViewSwitcher.getInstance().getPeople().remove(person);
+        if (response != null) {
+            ViewSwitcher.getInstance().getPeople().remove(person);
+            PeopleListController.getInstance().getPeopleList().getItems().remove(person);
+            logger.info("DELETING " + person.toString());
+        }
     }
 
     private static String checkResponse (CloseableHttpResponse response) throws IOException {
         switch (response.getStatusLine().getStatusCode()) {
             case 200:
-                System.out.println("200");
                 return getStringFromResponse(response);
+            case 400:
+                Alerts.infoAlert("400 Error", "Bad Request");
+                break;
             case 401:
-                throw new UnauthorizedException(response.getStatusLine().getReasonPhrase());
+                Alerts.infoAlert("401 Error", "Unauthorized Request");
+                break;
             case 404:
-                throw new UnknownException(response.getStatusLine().getReasonPhrase());
+                Alerts.infoAlert("404 Error", "Request Resource Not Found");
+                break;
             default:
-                throw new UnknownException(response.getStatusLine().getReasonPhrase());
+                Alerts.infoAlert("Unknown Error", "Something went wrong, please try again");
+                break;
         }
+        return null;
     }
 
     private static String executePostRequest(String url, String token, JSONObject newPersonInfo) throws IOException {

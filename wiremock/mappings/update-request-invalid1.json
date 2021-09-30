@@ -1,9 +1,8 @@
 {
   "request": {
     "method": "PUT",
-    "url": "/people/1",
     "bodyPatterns": [ {
-      "equalToJson": "{\"first_name\":\"Bobby\"}",
+      "equalToJson": "{\"fstName\":\"Bobby\"}",
       "ignoreArrayOrder" : true,
       "ignoreExtraElements" : true
     } ],
@@ -14,7 +13,7 @@
     }
   },
   "response": {
-    "status": 200,
+    "status": 400,
     "headers": {
       "Content-Type": "application/json"
     }

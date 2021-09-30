@@ -1,0 +1,16 @@
+{
+  "request": {
+    "method": "PUT",
+    "headers" : {
+      "Authorization" : {
+        "contains" : "i am a sesh token"
+      }
+    }
+  },
+  "response": {
+    "status": 401,
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

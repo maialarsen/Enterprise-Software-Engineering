@@ -5,6 +5,7 @@ import exceptions.UnknownException;
 import gateways.Session;
 import gateways.SessionGateway;
 import hash.HashUtils;
+import javafx.Alerts;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -35,10 +36,10 @@ public class LoginController implements Initializable {
         try {
             sessionId = SessionGateway.login(username, hash);
         } catch(UnauthorizedException e) {
-            logger.error("Login failed! Either your username or password is incorrect");
+            Alerts.infoAlert("Login Failed", "Invalid username or password");
             return;
         } catch (UnknownException e) {
-            logger.error("Login failed! Something went wrong please try again");
+            Alerts.infoAlert("Login Failed", "Something went wrong, please try again");
             return;
         }
 

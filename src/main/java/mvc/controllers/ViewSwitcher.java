@@ -83,6 +83,13 @@ public class ViewSwitcher {
                 break;
         }
     }
+    public Person findById(int id) {
+        for (int i = 0; i < people.size(); i++) {
+            if (people.get(i).getId() == id)
+                return people.get(i);
+        }
+        return null;
+    }
 
     public static void setInstance(ViewSwitcher instance) {
         ViewSwitcher.instance = instance;
